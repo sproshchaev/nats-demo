@@ -1,0 +1,55 @@
+# Демо 3: кластер из трёх серверов NATS плюс контейнер с CLI.
+name: nats-demo-cluster
+
+services:
+  n1:
+    image: nats:2.11-alpine
+    container_name: nats-n1
+    command: ["-c", "/etc/nats/nats.conf"]
+    ports:
+      - "4222:4222"   # клиенты n1
+      - "8222:8222"   # мониторинг n1: http://localhost:8222
+    volumes:
+      - ./n1.conf:/etc/nats/nats.conf:ro
+      - js1:/data/jetstream
+
+  n2:
+    image: nats:2.11-alpine
+    container_name: nats-n2
+    command: ["-c", "/etc/nats/nats.conf"]
+    ports:
+      - "4223:4222"
+      - "8223:8222"
+    volumes:
+      - ./n2.conf:/etc/nats/nats.conf:ro
+      - js2:/data/jetstream
+
+  n3:
+    image: nats:2.11-alpine
+    container_name: nats-n3
+    command: ["-c", "/etc/nats/nats.conf"]
+    ports:
+      - "4224:4222"
+      - "8224:8222"
+    volumes:
+      - ./n3.conf:/etc/nats/nats.conf:ro
+      - js3:/data/jetstream
+
+  box:
+    build: ../box
+    image: nats-demo-box:latest
+    container_name: box
+    depends_on: [n1, n2, n3]
+    environment:
+      NATS_URL: "nats://demo:secret@n1:4222"
+    volumes:
+      - ../scripts:/demo:ro
+    working_dir: /demo
+    tty: true
+    stdin_open: true
+    command: ["sleep", "infinity"]
+
+volumes:
+  js1:
+  js2:
+  js3:

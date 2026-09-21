@@ -1,0 +1,31 @@
+# Демо 1 и 2: один сервер NATS с JetStream плюс контейнер с CLI.
+name: nats-demo-single
+
+services:
+  nats:
+    image: nats:2.11-alpine
+    container_name: nats
+    command: ["-c", "/etc/nats/nats.conf"]
+    ports:
+      - "4222:4222"   # клиенты
+      - "8222:8222"   # мониторинг: http://localhost:8222
+    volumes:
+      - ./nats.conf:/etc/nats/nats.conf:ro
+      - jetstream:/data/jetstream
+
+  box:
+    build: ../box
+    image: nats-demo-box:latest
+    container_name: box
+    depends_on: [nats]
+    environment:
+      NATS_URL: "nats://demo:secret@nats:4222"
+    volumes:
+      - ../scripts:/demo:ro
+    working_dir: /demo
+    tty: true
+    stdin_open: true
+    command: ["sleep", "infinity"]
+
+volumes:
+  jetstream:
