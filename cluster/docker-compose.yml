@@ -3,7 +3,7 @@ name: nats-demo-cluster
 
 services:
   n1:
-    image: nats:2.11-alpine
+    image: nats:2.15.0-alpine
     container_name: nats-n1
     command: ["-c", "/etc/nats/nats.conf"]
     ports:
@@ -14,7 +14,7 @@ services:
       - js1:/data/jetstream
 
   n2:
-    image: nats:2.11-alpine
+    image: nats:2.15.0-alpine
     container_name: nats-n2
     command: ["-c", "/etc/nats/nats.conf"]
     ports:
@@ -25,7 +25,7 @@ services:
       - js2:/data/jetstream
 
   n3:
-    image: nats:2.11-alpine
+    image: nats:2.15.0-alpine
     container_name: nats-n3
     command: ["-c", "/etc/nats/nats.conf"]
     ports:
@@ -37,7 +37,7 @@ services:
 
   box:
     build: ../box
-    image: nats-demo-box:latest
+    image: nats-demo-box:1.0
     container_name: box
     depends_on: [n1, n2, n3]
     environment:
