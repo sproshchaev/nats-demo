@@ -4,7 +4,7 @@
 set -e
 echo "== Пример 11. Подписчик на n3, издатель на n1 =="
 docker exec -i box sh -s <<'NATS'
-pkill -f 'nats sub' 2>/dev/null
+pkill -f 'nats.*sub' 2>/dev/null || true
 sleep 0.3
 nats -s nats://demo:secret@n3:4222 sub "orders.>" > /tmp/n3.log 2>&1 &
 sleep 1
@@ -13,5 +13,5 @@ nats pub orders.created "привет из n1"
 sleep 1
 echo "--- что получил подписчик узла n3 ---"
 grep -A1 Received /tmp/n3.log
-pkill -f 'nats sub'
+pkill -f 'nats.*sub' 2>/dev/null || true
 NATS

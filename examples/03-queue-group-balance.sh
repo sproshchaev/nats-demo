@@ -4,7 +4,7 @@
 set -e
 echo "== Пример 3. Каждое сообщение достается одному подписчику =="
 docker exec -i box sh -s <<'NATS'
-pkill -f 'nats sub' 2>/dev/null
+pkill -f 'nats.*sub' 2>/dev/null || true
 sleep 0.3
 nats sub "orders.>" --queue workers > /tmp/w1.log 2>&1 &
 nats sub "orders.>" --queue workers > /tmp/w2.log 2>&1 &
@@ -14,5 +14,5 @@ sleep 1
 echo "worker 1 получил: $(grep -c Received /tmp/w1.log) | $(grep -h '^order-' /tmp/w1.log | tr '\n' ' ')"
 echo "worker 2 получил: $(grep -c Received /tmp/w2.log) | $(grep -h '^order-' /tmp/w2.log | tr '\n' ' ')"
 echo "всего отправлено: 6, дублей нет"
-pkill -f 'nats sub'
+pkill -f 'nats.*sub' 2>/dev/null || true
 NATS
