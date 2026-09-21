@@ -59,11 +59,22 @@ exit
 NATS поднимается обычным `docker compose`, скрипты — это обёртки вокруг него:
 
 ```bash
-docker compose -f single/docker-compose.yml up -d --build     # один сервер с JetStream
+docker compose -f single/docker-compose.yml up -d             # один сервер с JetStream
 docker compose -f single/docker-compose.yml exec box sh       # войти в контейнер с CLI
-docker compose -f cluster/docker-compose.yml up -d --build    # кластер из трёх узлов
+docker compose -f cluster/docker-compose.yml up -d            # кластер из трёх узлов
 docker compose -f single/docker-compose.yml down -v           # погасить и стереть данные
 ```
+
+Образ с командной строкой compose соберёт сам при первом запуске, если его ещё нет. Пересобрать
+принудительно (например, после правки `box/Dockerfile`):
+
+```bash
+docker compose -f single/docker-compose.yml build
+```
+
+Флага `--build` в скриптах намеренно нет: с ним каждый запуск обращается к реестру за базовым
+образом, а значит зависит от сети. Собранный `nats-demo-box:1.0` лежит локально, и стенд
+поднимается без единого сетевого запроса.
 
 Скрипты делают поверх этого две вещи, из-за которых их и стоит предпочесть: гасят соседний стенд,
 чтобы не столкнуться на порту 4222, и после старта проверяют подключение командой
