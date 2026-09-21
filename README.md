@@ -54,6 +54,22 @@ exit
 ./down.sh
 ```
 
+### То же самое без скриптов
+
+NATS поднимается обычным `docker compose`, скрипты — это обёртки вокруг него:
+
+```bash
+docker compose -f single/docker-compose.yml up -d --build     # один сервер с JetStream
+docker compose -f single/docker-compose.yml exec box sh       # войти в контейнер с CLI
+docker compose -f cluster/docker-compose.yml up -d --build    # кластер из трёх узлов
+docker compose -f single/docker-compose.yml down -v           # погасить и стереть данные
+```
+
+Скрипты делают поверх этого две вещи, из-за которых их и стоит предпочесть: гасят соседний стенд,
+чтобы не столкнуться на порту 4222, и после старта проверяют подключение командой
+`nats server check connection`. Поднимать кластер, не погасив одиночный сервер, нельзя: порты
+заняты, и compose ответит `port is already allocated`.
+
 ---
 
 ## Таблица примеров
